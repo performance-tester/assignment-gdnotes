@@ -7,7 +7,8 @@ runs:
       run: |
         echo "Installing k6 load tool"
         sudo apt-get update && sudo apt-get install -y gnupg2 ca-certificates
-        curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/k6.gpg
+        curl -s https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
         sudo apt-get update
         sudo apt-get install -y k6
         k6 version
