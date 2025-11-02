@@ -44,6 +44,9 @@ jobs:
       - name: Setup NGINX Ingress
         uses: ./.github/actions/setup-ingress
 
+      - name: Deploy Echo Apps
+        uses: ./.github/actions/deploy-apps
+
       - name: Verify Ingress setup
         run: |
           kubectl get pods -n ingress-nginx
