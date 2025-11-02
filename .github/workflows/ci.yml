@@ -47,6 +47,9 @@ jobs:
       - name: Deploy Echo Apps
         uses: ./.github/actions/deploy-apps
 
+      - name: Run K6 Load Test
+        uses: ./.github/actions/run-loadtest
+
       - name: Verify Ingress setup
         run: |
           kubectl get pods -n ingress-nginx
