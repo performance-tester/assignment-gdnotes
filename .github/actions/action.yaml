@@ -1,0 +1,15 @@
+name: "Setup NGINX Ingress Controller"
+description: "Deploys and waits for NGINX Ingress Controller on KinD"
+runs:
+  using: "composite"
+  steps:     
+    - name: Deploy NGINX Ingress Controller
+      run: |
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+        echo "Waiting for ingress controller to become ready..."
+        kubectl wait --namespace ingress-nginx \
+          --for=condition=ready pod \
+          --selector=app.kubernetes.io/component=controller \
+          --timeout=120s
+
+        kubectl get pods -n ingress-nginx
