@@ -6,6 +6,10 @@ runs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Make entrypoint executable
+      shell: bash
+      run: chmod +x ./.github/actions/jmeter-load-test/entrypoint.sh
+
     - name: Run JMeter script
       shell: bash
       run: ./.github/actions/jmeter-load-test/entrypoint.sh
