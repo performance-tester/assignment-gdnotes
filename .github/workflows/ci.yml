@@ -40,3 +40,15 @@ jobs:
         run: |
           kubectl get pods 
           echo "Kind cluster with multi-node is created successfully"
+
+      - name: Setup NGINX Ingress
+        uses: ./.github/actions/setup-ingress
+
+      - name: Verify Ingress setup
+        run: |
+          kubectl get pods -n ingress-nginx
+          kubectl get svc -n ingress-nginx
+
+      - name: Clean up KinD cluster
+        if: always()
+        run: kind delete cluster --name test-cluster
