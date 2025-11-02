@@ -3,7 +3,7 @@ name: CI-kind
 on: 
   pull_request:
      branches:
-       - msin
+       - main
 
 jobs:
   build: 
