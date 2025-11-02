@@ -37,7 +37,7 @@ jobs:
  
       - name: test the pods
         run: |
-           kubectl get pods  -A 
+           kubectl get pods 
            echo "Kind cluster with multi-node is created successfully"
 
         
