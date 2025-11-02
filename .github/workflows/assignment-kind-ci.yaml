@@ -34,3 +34,10 @@ jobs:
           kind create cluster --name ci-multinode-cluster --config kind-config.yaml
           kind cluster-info
           kubectl get nodes
+ 
+      - name: test the pods
+        run: |
+           kubectl get pods  -A 
+           echo "Kind cluster with multi-node is created successfully"
+
+        
