@@ -1,0 +1,11 @@
+name: JMeter Load Test
+description: "running Jmeter test"
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Run JMeter script
+      shell: bash
+      run: ./.github/actions/jmeter-load-test/entrypoint.sh
