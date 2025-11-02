@@ -1,0 +1,155 @@
+name: "Deploy and Test Echo Apps"
+description: "Deploys foo/bar echo apps, waits for readiness, and tests Ingress routes"
+runs:
+  using: "composite"
+  steps:
+    - name: Deploy http-echo apps
+      shell: bash
+      run: |
+        echo "🚀 Deploying foo and bar echo services..."
+        cat <<EOF | kubectl apply -f -
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: echo
+        ---
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: foo-deployment
+          namespace: echo
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: foo
+          template:
+            metadata:
+              labels:
+                app: foo
+            spec:
+              containers:
+              - name: foo
+                image: hashicorp/http-echo
+                args:
+                  - "-text=foo"
+                ports:
+                  - containerPort: 5678
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: foo-service
+          namespace: echo
+        spec:
+          selector:
+            app: foo
+          ports:
+            - port: 80
+              targetPort: 5678
+        ---
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: bar-deployment
+          namespace: echo
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: bar
+          template:
+            metadata:
+              labels:
+                app: bar
+            spec:
+              containers:
+              - name: bar
+                image: hashicorp/http-echo
+                args:
+                  - "-text=bar"
+                ports:
+                  - containerPort: 5678
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: bar-service
+          namespace: echo
+        spec:
+          selector:
+            app: bar
+          ports:
+            - port: 80
+              targetPort: 5678
+        ---
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: echo-ingress
+          namespace: echo
+          annotations:
+            nginx.ingress.kubernetes.io/rewrite-target: /
+        spec:
+          ingressClassName: nginx
+          rules:
+            - host: foo.local
+              http:
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: foo-service
+                        port:
+                          number: 80
+            - host: bar.local
+              http:
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: bar-service
+                        port:
+                          number: 80
+        EOF
+
+        kubectl get all -n echo
+
+    - name: Wait for echo pods to be ready
+      shell: bash
+      run: |
+        echo "⏳ Waiting for foo and bar pods to be ready..."
+        kubectl wait --for=condition=ready pod -l app=foo -n echo --timeout=120s
+        kubectl wait --for=condition=ready pod -l app=bar -n echo --timeout=120s
+        kubectl get pods -n echo
+
+    - name: Test Ingress routes
+      shell: bash
+      run: |
+        echo "🔌 Starting port-forward to ingress-nginx..."
+        kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8080:80 &
+        sleep 10
+
+        echo "🧪 Testing foo.local..."
+        for i in {1..10}; do
+          if curl -s -H "Host: foo.local" localhost:8080 | grep -q "foo"; then
+            echo "✅ foo.local OK"
+            break
+          else
+            echo "Waiting for foo.local... attempt $i"
+            sleep 5
+          fi
+        done
+
+        echo "🧪 Testing bar.local..."
+        for i in {1..10}; do
+          if curl -s -H "Host: bar.local" localhost:8080 | grep -q "bar"; then
+            echo "✅ bar.local OK"
+            break
+          else
+            echo "Waiting for bar.local... attempt $i"
+            sleep 5
+          fi
+        done
