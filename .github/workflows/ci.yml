@@ -47,8 +47,11 @@ jobs:
       - name: Deploy Echo Apps
         uses: ./.github/actions/deploy-apps
 
-      - name: Run K6 Load Test
+      - name: Run Jmeter Load Test
         uses: ./.github/actions/jmeter-load-test
+
+      - name: Post Results in PR comment
+        uses: ./.github/actions/post-results-to-pr
 
       - name: Verify Ingress setup
         run: |
