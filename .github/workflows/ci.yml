@@ -72,6 +72,11 @@ jobs:
         with:
           namespace: monitoring
 
+      - name: Collect Prometheus Metrics
+        uses: ./.github/actions/collect-prometheus-metrics
+        with:
+          namespace: monitoring
+
       - name: Clean up KinD cluster
         if: always()
         run: kind delete cluster --name test-cluster
