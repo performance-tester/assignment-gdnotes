@@ -3,16 +3,25 @@ set -e
 
 # Install Java
 sudo apt-get update
-sudo apt-get install -y openjdk-11-jdk wget unzip
+sudo apt-get install -y openjdk-17-jre-headless wget unzip
 
 # Install JMeter
-wget https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.7.1.zip
-unzip apache-jmeter-5.7.1.zip
-sudo mv apache-jmeter-5.7.1 /opt/jmeter
-export PATH=$PATH:/opt/jmeter/bin
+echo "📦 Downloading Apache JMeter v$JMETER_VERSION..."
+wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-$JMETER_VERSION.zip -O /tmp/apache-jmeter.zip
 
-# Run JMeter test
-/opt/jmeter/bin/jmeter -n \
+unzip -q /tmp/apache-jmeter.zip -d /opt/
+sudo mv /opt/apache-jmeter-$JMETER_VERSION $JMETER_DIR
+export PATH=$PATH:$JMETER_DIR/bin
+
+# Verify installation
+echo "✅ Installed JMeter version:"
+jmeter -v
+
+# ----------------------------------------------------------
+# Run JMeter test plan
+# ----------------------------------------------------------
+echo "🏋️ Running JMeter load test..."
+jmeter -n \
   -t .github/actions/jmeter-load-test/load-test.jmx \
   -l jmeter-results.jtl \
   -j jmeter.log
