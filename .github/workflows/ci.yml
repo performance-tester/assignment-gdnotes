@@ -50,8 +50,12 @@ jobs:
       - name: Run Jmeter Load Test
         uses: ./.github/actions/jmeter-load-test
 
-      - name: Post Results in PR comment
+      - name: Post JMeter Results as PR Comment
+        if: github.event_name == 'pull_request'
         uses: ./.github/actions/post-results-to-pr
+        with:
+         github-token: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Verify Ingress setup
         run: |

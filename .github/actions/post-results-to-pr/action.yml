@@ -1,5 +1,11 @@
 name: "Post JMeter Results to PR"
 description: "Posts the summarized JMeter result in PR comment"
+
+inputs:
+  github-token:
+    description: "GitHub token to post comment"
+    required: true
+
 runs:
   using: "composite"
   steps:
