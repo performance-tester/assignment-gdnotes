@@ -4,7 +4,7 @@ inputs:
   namespace:
     description: "Deploy Prometheus"
     required: false
-    default: "prometheus"
+    default: "monitoring"
 runs:
   using: "composite"
   steps:

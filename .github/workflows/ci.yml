@@ -67,8 +67,7 @@ jobs:
       - name: Deploy Prometheus
         uses: ./.github/actions/deploy-prometheus
         with:
-          namespace: prometheus
-
+          namespace: monitoring
 
       - name: Clean up KinD cluster
         if: always()
