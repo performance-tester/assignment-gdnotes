@@ -12,7 +12,7 @@ runs:
     - name: Post JMeter results comment
       uses: actions/github-script@v7
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.github-token }}
         script: |
           const avg = process.env.AVG || "N/A";
           const p90 = process.env.P90 || "N/A";
@@ -21,7 +21,7 @@ runs:
           const rps = process.env.REQ_PER_SEC || "N/A";
 
           const body = `
-          ## 🧪 JMeter Load Test Results
+          ## JMeter Load Test Results
 
           | Metric | Value |
           |--------|-------|
