@@ -70,12 +70,7 @@ jobs:
       - name: Deploy Prometheus
         uses: ./.github/actions/deploy-prometheus
         with:
-          namespace: monitoring
-
-      - name: Collect Prometheus Metrics
-        uses: ./.github/actions/collect-prometheus-metrics
-        with:
-          namespace: monitoring
+          namespace: monitori
 
       - name: Clean up KinD cluster
         if: always()

@@ -12,7 +12,7 @@ runs:
     - name: Wait for Prometheus pod
       shell: bash
       run: |
-        echo "🔍 Waiting for Prometheus pod to become ready..."
+        echo " Waiting for Prometheus pod to become ready..."
 
         # Find Prometheus pod name
         POD=$(kubectl get pods -n monitoring -l app.kubernetes.io/name=prometheus \
@@ -43,7 +43,7 @@ runs:
         kubectl port-forward -n monitoring $POD 9090:9090 &
         sleep 10
 
-        echo "📊 Querying Prometheus..."
+        echo "Querying Prometheus..."
         CPU=$(curl -s "http://localhost:9090/api/v1/query?query=sum(rate(container_cpu_usage_seconds_total{namespace='${{ inputs.namespace }}'}[1m]))" | jq -r '.data.result[0].value[1]')
         MEM=$(curl -s "http://localhost:9090/api/v1/query?query=sum(container_memory_usage_bytes{namespace='${{ inputs.namespace }}'})" | jq -r '.data.result[0].value[1]')
 
