@@ -6,6 +6,10 @@ sudo apt-get update
 sudo apt-get install -y openjdk-17-jre-headless wget unzip
 
 # Install JMeter
+
+JMETER_VERSION="5.7.1"
+JMETER_DIR="/opt/jmeter"
+
 echo "📦 Downloading Apache JMeter v$JMETER_VERSION..."
 wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-$JMETER_VERSION.zip -O /tmp/apache-jmeter.zip
 
