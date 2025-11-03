@@ -1,0 +1,77 @@
+name: CI-Kind-Goodnotes
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Install Kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+      - name: Create Kind Cluster with Multi-node Configuration
+        run: |
+          cat <<EOF > kind-config.yaml
+          kind: Cluster
+          apiVersion: kind.x-k8s.io/v1alpha4
+          nodes:
+            - role: control-plane
+            - role: worker
+          EOF
+          kind create cluster --name ci-multinode-cluster --config kind-config.yaml
+          kind cluster-info
+          kubectl get nodes
+
+      - name: Verify Pods in the Cluster
+        run: |
+          kubectl get pods 
+          echo "Kind cluster with multi-node is created successfully"
+
+      - name: Setup NGINX Ingress
+        uses: ./.github/actions/setup-ingress
+
+      - name: Deploy Echo Apps
+        uses: ./.github/actions/deploy-apps
+
+      - name: Run Jmeter Load Test
+        uses: ./.github/actions/jmeter-load-test
+
+      - name: Post JMeter Results as PR Comment
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/post-results-to-pr
+        with:
+         github-token: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Verify Ingress setup
+        run: |
+          kubectl get pods -n ingress-nginx
+          kubectl get svc -n ingress-nginx
+
+      - name: Deploy Prometheus
+        uses: ./.github/actions/deploy-prometheus
+        with:
+          namespace: monitori
+
+      - name: Clean up KinD cluster
+        if: always()
+        run: kind delete cluster --name test-cluster

@@ -1,0 +1,46 @@
+name: "Post JMeter Results to PR"
+description: "Posts the summarized JMeter result in PR comment"
+
+inputs:
+  github-token:
+    description: "GitHub token to post comment"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Post JMeter results comment
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const avg = process.env.AVG || "N/A";
+          const p90 = process.env.P90 || "N/A";
+          const p95 = process.env.P95 || "N/A";
+          const failrate = process.env.FAIL_RATE || "N/A";
+          const rps = process.env.REQ_PER_SEC || "N/A";
+
+          const body = `
+          ## JMeter Load Test Results
+
+          | Metric | Value |
+          |--------|-------|
+          | Avg Duration (ms) | ${avg} |
+          | P90 Duration (ms) | ${p90} |
+          | P95 Duration (ms) | ${p95} |
+          | Failure Rate (%) | ${failrate} |
+          | Requests/sec | ${rps} |
+
+          _Generated automatically by CI pipeline 
+          `;
+
+          if (context.payload.pull_request) {
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+          } else {
+            console.log("No PR context, skipping comment.");
+            }
