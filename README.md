@@ -1,5 +1,7 @@
 # assignment-gdnotes
 
+Total Time taken : 6 hours
+
 #Install Kind
 
 Install KinD from the Step : s://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
