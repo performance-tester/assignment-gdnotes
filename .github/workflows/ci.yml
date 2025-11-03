@@ -64,6 +64,12 @@ jobs:
           kubectl get pods -n ingress-nginx
           kubectl get svc -n ingress-nginx
 
+      - name: Deploy Prometheus
+        uses: ./.github/actions/deploy-prometheus
+        with:
+          namespace: prometheus
+
+
       - name: Clean up KinD cluster
         if: always()
         run: kind delete cluster --name test-cluster

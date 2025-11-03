@@ -1,0 +1,22 @@
+name: "Deploy Prometheus"
+description: "Deploys Prometheus in kind cluster"
+inputs:
+  namespace:
+    description: "Deploy Prometheus"
+    required: false
+    default: "prometheus"
+runs:
+  using: "composite"
+  steps:
+    - name: Deploy Prometheus via Helm
+      shell: bash
+      run: |
+        ns="${{ inputs.namespace }}"
+        kubectl create namespace "$ns" || true
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+        helm upgrade --install prometheus prometheus-community/prometheus \
+          --namespace "$ns" \
+          --set alertmanager.enabled=false \
+          --set pushgateway.enabled=false
+        kubectl get pods -n "$ns"
