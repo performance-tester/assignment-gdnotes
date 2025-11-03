@@ -1,5 +1,5 @@
 name: "Collect Prometheus Metrics"
-description: "Fetch CPU and memory utilization for echo namespace"
+description: "Fetch CPU and memory utilization for default namespace"
 runs:
   using: "composite"
   steps:
@@ -11,7 +11,7 @@ runs:
         kubectl port-forward -n monitoring $POD 9090:9090 &
         sleep 10
 
-        # Fetch CPU and memory usage for echo namespace
+        
         CPU=$(curl -s "http://localhost:9090/api/v1/query?query=sum(rate(container_cpu_usage_seconds_total{namespace='echo'}[1m]))" | jq -r '.data.result[0].value[1]')
         MEM=$(curl -s "http://localhost:9090/api/v1/query?query=sum(container_memory_usage_bytes{namespace='echo'})" | jq -r '.data.result[0].value[1]')
 
