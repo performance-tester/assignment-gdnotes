@@ -7,27 +7,24 @@ sudo apt-get install -y openjdk-17-jre-headless wget unzip
 
 # Install JMeter
 
-JMETER_VERSION="5.6.3"   # 🧩 use the latest LTS-like release
-JMETER_DIR="/opt/jmeter"
-JMETER_TGZ="apache-jmeter-${JMETER_VERSION}.zip"
+JMETER_VERSION=5.6.3
+echo "📦 Downloading Apache JMeter v$JMETER_VERSION..."
+wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-$JMETER_VERSION.zip
+unzip -q apache-jmeter-$JMETER_VERSION.zip
+sudo mv apache-jmeter-$JMETER_VERSION /opt/jmeter
+export PATH=$PATH:/opt/jmeter/bin
 
-echo "📦 Downloading Apache JMeter v${JMETER_VERSION} from an official mirror..."
-
-# Apache provides a redirector that always points to a live mirror
-JMETER_URL="https://downloads.apache.org/jmeter/binaries/${JMETER_TGZ}"
-if ! wget -q "$JMETER_URL" -O /tmp/${JMETER_TGZ}; then
-  echo "⚠️ Primary mirror failed, using archive.apache.org fallback..."
-  wget -q "https://archive.apache.org/dist/jmeter/binaries/${JMETER_TGZ}" -O /tmp/${JMETER_TGZ}
-fi
-
-echo "Extracting JMeter..."
-unzip -q /tmp/${JMETER_TGZ} -d /opt/
-sudo mv /opt/apache-jmeter-${JMETER_VERSION} $JMETER_DIR
-export PATH=$PATH:$JMETER_DIR/bin
+# Verify
 jmeter -v
 
+# Run JMeter test
+/opt/jmeter/bin/jmeter -n \
+  -t .github/actions/jmeter-load-test/load-test.jmx \
+  -l jmeter-results.jtl \
+  -j jmeter.log
+
 # Verify installation
-echo "✅ Installed JMeter version:"
+echo "Installed JMeter version:"
 jmeter -v
 
 # ----------------------------------------------------------
