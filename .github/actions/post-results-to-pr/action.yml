@@ -31,12 +31,16 @@ runs:
           | Failure Rate (%) | ${failrate} |
           | Requests/sec | ${rps} |
 
-          _Generated automatically by CI pipeline 🚀_
+          _Generated automatically by CI pipeline 
           `;
 
-          await github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body
-          });
+          if (context.payload.pull_request) {
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+          } else {
+            console.log("No PR context, skipping comment.");
+            }
