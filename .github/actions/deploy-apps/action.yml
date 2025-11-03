@@ -6,7 +6,7 @@ runs:
     - name: Deploy http-echo apps
       shell: bash
       run: |
-        echo "🚀 Deploying foo and bar echo services..."
+        echo "Deploying foo and bar echo services"
         cat <<EOF | kubectl apply -f -
         apiVersion: v1
         kind: Namespace
@@ -135,7 +135,7 @@ runs:
         echo "Testing foo.local..."
         for i in {1..10}; do
           if curl -s -H "Host: foo.local" localhost:8080 | grep -q "foo"; then
-            echo "✅ foo.local OK"
+            echo "foo.local OK"
             break
           else
             echo "Waiting for foo.local... attempt $i"
@@ -146,7 +146,7 @@ runs:
         echo "Testing bar.local..."
         for i in {1..10}; do
           if curl -s -H "Host: bar.local" localhost:8080 | grep -q "bar"; then
-            echo "✅ bar.local OK"
+            echo "bar.local OK"
             break
           else
             echo "Waiting for bar.local... attempt $i"
